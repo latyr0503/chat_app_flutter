@@ -1,6 +1,8 @@
+import 'package:chat_app/pages/auth/services/auth_services.dart';
 import 'package:chat_app/widgets/my_button.dart';
 import 'package:chat_app/widgets/my_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   final void Function()? onTap;
@@ -16,7 +18,27 @@ class _LoginPageState extends State<LoginPage> {
   final passcordController = TextEditingController();
 
   // sign In
-  void signIn() {}
+  Future<void> signIn() async {
+    // get the auth services
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    try {
+      await authService.signInWithEmailandPassword(
+        emailController.text,
+        passcordController.text,
+      );
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //logo
-                const Icon(Icons.message, size: 80, color: Colors.blue),
+                const Icon(Icons.message_outlined, size: 80, color: Colors.blue),
                 const SizedBox(height: 60),
                 //welcome back message
                 const Text(

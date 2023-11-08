@@ -1,63 +1,90 @@
-import 'package:chat_app/res/dimens.dart';
-import 'package:chat_app/widgets/find_doctor.dart';
-import 'package:chat_app/widgets/header.dart';
+import 'package:chat_app/pages/auth/services/auth_services.dart';
+import 'package:chat_app/pages/message_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // instance of auth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // deconnexion de l;utilisateur
+  void signOut() {
+    // get auth service
+    final authService = Provider.of<AuthService>(
+      context,
+      listen: false,
+    );
+    authService.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.blue,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.save_2),
-            label: "Visits",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.message),
-            label: "Message",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.user),
-            label: "Profile",
-          ),
+      appBar: AppBar(
+        title: const Text("Page d'accueil"),
+        actions: [
+          // boutton de deconnexion
+          IconButton(
+            onPressed: signOut,
+            icon: const Icon(Icons.logout_outlined),
+          )
         ],
-        onTap: (index) {
-          switch (index) {
-            case 1:
-              Navigator.pushNamed(context, '/visits');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/message');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
       ),
-      body: Padding(
-        padding: EdgeInsets.all(AppDimensions.baseSize * 2),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const TopCardSection(),
-              AppDimensions.vSpace(2),
-              const FindDoctor(),
-            ],
-          ),
-        ),
-      ),
+      body: _buildUserList(),
     );
+  }
+
+  // build list of users except for the current logged in user
+  Widget _buildUserList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Text('Erreur');
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text('Page en chargement...');
+        }
+        return ListView(
+          children: snapshot.data!.docs
+              .map<Widget>((doc) => _buildUserListItem(doc))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  // build individual user list items
+  Widget _buildUserListItem(DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    // display all users except current user
+    if (_auth.currentUser!.email != data['email']) {
+      return ListTile(
+        title: Text(data['email']),
+        onTap: () {
+          // pass the clickes user's UID to the chat page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MessageriePage(
+                receiverUserEmail: data['email'],
+                receiverUserID: data['uid'],
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      // return empty container
+      return Container();
+    }
   }
 }

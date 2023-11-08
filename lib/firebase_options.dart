@@ -17,21 +17,18 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
-      case TargetPlatform.macOS:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
+          'DefaultFirebaseOptions have not been configured for ios - '
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
+      case TargetPlatform.macOS:
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,6 +46,15 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyD3g36EX6y5D4MZk5BxkYxnpiPhAC2JOC8',
+    appId: '1:84177981190:web:ae200fadd1523ea75bd887',
+    messagingSenderId: '84177981190',
+    projectId: 'exam-reactjs',
+    authDomain: 'exam-reactjs.firebaseapp.com',
+    storageBucket: 'exam-reactjs.appspot.com',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC_gvHZ9O1vBx5L-TH3EUJa0L-QXDXrqbI',
     appId: '1:84177981190:android:b5f1da00764ba7645bd887',
@@ -57,14 +63,13 @@ class DefaultFirebaseOptions {
     storageBucket: 'exam-reactjs.appspot.com',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBYyqdUXRqcy1TEQcRyZbRdI1CADVF3qTQ',
-    appId: '1:84177981190:ios:4d909fbf8ea23c6f5bd887',
+    appId: '1:84177981190:ios:bf99f807bb845ad55bd887',
     messagingSenderId: '84177981190',
     projectId: 'exam-reactjs',
     storageBucket: 'exam-reactjs.appspot.com',
-    iosClientId:
-        '84177981190-6m05c9kure5j4n6v672uha5qt3nj2lh7.apps.googleusercontent.com',
-    iosBundleId: 'com.example.doctorApp',
+    iosClientId: '84177981190-ltnq64obt1rgb47jp2egdcp842b71ktc.apps.googleusercontent.com',
+    iosBundleId: 'com.example.doctorApp.RunnerTests',
   );
 }

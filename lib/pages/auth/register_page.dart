@@ -1,6 +1,8 @@
+import 'package:chat_app/pages/auth/services/auth_services.dart';
 import 'package:chat_app/widgets/my_button.dart';
 import 'package:chat_app/widgets/my_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -13,11 +15,36 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   // text_controllers
   final emailController = TextEditingController();
-  final passcordController = TextEditingController();
-  final confirmPasscordController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   // int money = 20;
   //sign up user
-  void signUp() {}
+  void signUp() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Verifier les mots de pass entre ne correspond pas"),
+        ),
+      );
+      return;
+    }
+    // get auth service
+    final authService = Provider.of<AuthService>(context, listen: false);
+    try {
+      await authService.signUpWithEmailandPassword(
+        emailController.text,
+        passwordController.text,
+      );
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,14 +75,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 15),
                 //password textfield
                 MyTextFiel(
-                    controller: passcordController,
+                    controller: passwordController,
                     hintText: 'Mot de passe...',
                     obscureText: true),
                 // espacement
                 const SizedBox(height: 15),
                 //confirme password textfield
                 MyTextFiel(
-                    controller: confirmPasscordController,
+                    controller: confirmPasswordController,
                     hintText: 'Confirmer votre Mot de passe...',
                     obscureText: true),
                 // espacement
