@@ -13,11 +13,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // instance of auth
+  // instance d'authentification
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  // deconnexion de l;utilisateur
+  // Déconnexion de l'utilisateur
   void signOut() {
-    // get auth service
+    // obtient le service d'authentification
     final authService = Provider.of<AuthService>(
       context,
       listen: false,
@@ -38,11 +38,28 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: _buildUserList(),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const Text(
+              'Liste de discussion',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // message
+            Expanded(
+              child: _buildUserList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  // build list of users except for the current logged in user
+ // construit la liste des utilisateurs à l'exception de l'utilisateur actuellement connecté
   Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
@@ -62,15 +79,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // build individual user list items
+  // crée des éléments de liste d'utilisateurs individuels
   Widget _buildUserListItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    // display all users except current user
+    // affiche tous les utilisateurs sauf l'utilisateur actuel
     if (_auth.currentUser!.email != data['email']) {
       return ListTile(
         title: Text(data['email']),
         onTap: () {
-          // pass the clickes user's UID to the chat page
+          // transmet l'UID de l'utilisateur cliqué à la page de discussion
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -83,7 +100,7 @@ class _HomePageState extends State<HomePage> {
         },
       );
     } else {
-      // return empty container
+      // renvoie le conteneur vide
       return Container();
     }
   }
