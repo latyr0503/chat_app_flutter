@@ -4,18 +4,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatService extends ChangeNotifier {
-  // get instance of auth and firestore
+  // obtenir une instance d'authentification et de Firestore
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   // send message
   Future<void> sendMessage(String receiverId, String message) async {
-    // get current user info
+    // obtenir des informations sur l'utilisateur actuel
     final String currentUserId = _firebaseAuth.currentUser!.uid;
     final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
     final Timestamp timestamp = Timestamp.now();
 
-    // create a new message
+    // créer un nouveau message
     Message newMessage = Message(
         senderEmail: currentUserEmail,
         senderId: currentUserId,
@@ -23,12 +23,12 @@ class ChatService extends ChangeNotifier {
         timestamp: timestamp,
         message: message);
 
-    // construct chat room id from current user id and receiver id (sorted to ensure uniqueness)
+    // construire l'identifiant de la salle de discussion à partir de l'identifiant de l'utilisateur actuel et de l'identifiant du destinataire (triés pour garantir l'unicité)
     List<String> ids = [currentUserId, receiverId];
-    ids.sort(); //sort the ids (this ensures the chat room id is always the same for any pair of poeple)
+    ids.sort(); // trier les identifiants (cela garantit que l'identifiant de la salle de discussion est toujours le même pour n'importe quelle paire de personnes)
     String chatRoomId = ids.join(
-        "_"); //combine the ids into a single string to use as a chatroomID
-    // add new message to database
+        "_"); //combinez les identifiants en une seule chaîne à utiliser comme identifiant de salle de discussion
+    // ajouter un nouveau message à la base de données
     await _fireStore
         .collection('chat_rooms')
         .doc(chatRoomId)
@@ -38,7 +38,7 @@ class ChatService extends ChangeNotifier {
 
   // GET MESSAGE
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
-    // construct chat room id from user ids (sorted to ensure it matches the id when sending message)
+    // construire l'identifiant de la salle de discussion à partir des identifiants des utilisateurs
     List<String> ids = [userId, otherUserId];
     ids.sort();
     String chatRoomId = ids.join("_");
