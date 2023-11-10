@@ -24,11 +24,11 @@ class _MessageriePageState extends State<MessageriePage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   void sendMessage() async {
-    // only send message if there is something to send
+    // n'envoyer un message que s'il y a quelque chose à envoyer
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
           widget.receiverUserID, _messageController.text);
-      // clear  the  controller after sending the message
+      //effacer le contrôleur après avoir envoyé le message
       _messageController.clear();
     }
   }
@@ -46,7 +46,7 @@ class _MessageriePageState extends State<MessageriePage> {
             Expanded(
               child: _buildMessageList(),
             ),
-            // user input
+            // entrée utilisateur
             _buildMessageInput(),
           ],
         ),
@@ -54,7 +54,7 @@ class _MessageriePageState extends State<MessageriePage> {
     );
   }
 
-  // build message list
+  //créer une liste de messages
   Widget _buildMessageList() {
     return StreamBuilder(
       stream: _chatService.getMessages(
@@ -75,11 +75,11 @@ class _MessageriePageState extends State<MessageriePage> {
     );
   }
 
-  // build message item
+  //créer un élément de message
   Widget _buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-    // align the message to the right if the sender is the current user, otherwise to the left
+    //aligner le message à droite si l'expéditeur est l'utilisateur actuel, sinon à gauche
     var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid)
         ? Alignment.centerRight
         : Alignment.centerLeft;
@@ -107,7 +107,7 @@ class _MessageriePageState extends State<MessageriePage> {
     );
   }
 
-  // build message input
+  // créer une entrée de message
   Widget _buildMessageInput() {
     return Row(
       children: [
@@ -120,7 +120,7 @@ class _MessageriePageState extends State<MessageriePage> {
           ),
         ),
 
-        // send button
+        // boutton d'envoi
         IconButton(
           onPressed: sendMessage,
           icon: const Icon(
